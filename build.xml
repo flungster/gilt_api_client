@@ -1,0 +1,86 @@
+<project name="gilt-api-client" default="jar" basedir=".">
+  <property name="targetdir" value="target"/>
+  <property name="srcdir" value="src/main/java"/>
+  <property name="test_srcdir" value="src/test/java"/>
+  <property name="classdir" value="${targetdir}/classes"/>
+  <property name="test_classdir" value="${targetdir}/tests"/>
+  <property name="docdir" value="javadocs"/>
+  <property name="distdir" value="dist"/>
+
+  <target name="init">
+    <mkdir dir="${classdir}"/>
+    <mkdir dir="${test_classdir}"/>
+  </target>
+
+  <target name="clean">
+    <delete dir="${classdir}"/>
+    <delete dir="${test_classdir}"/>
+    <delete dir="${targetdir}"/>
+    <delete dir="gilt-api-client.jar"/>
+    <delete dir="${docdir}"/>
+  </target>
+
+  <path id="classpath">
+    <fileset dir="lib">
+      <include name="**/*.jar"/>
+    </fileset>
+    <pathelement path="${classdir}" />
+  </path>
+
+  <path id="test_classpath">
+    <path refid="classpath"/>
+    <pathelement path="${test_classdir}" />
+  </path>
+
+  <target name="compile" depends="clean, init">
+        <javac debug="on" srcdir="${srcdir}" destdir="${classdir}" classpathref="classpath"/>
+  </target>
+  
+  <target name="compile_tests" depends="jar">
+    <javac debug="on" srcdir="${test_srcdir}" destdir="${test_classdir}" classpathref="test_classpath"/>
+  </target>
+  
+  <target name="jar" depends="compile" description="Builds a complete Gilt api client jar.">
+    <exec  executable="git" outputproperty="git-desc">
+      <arg value="describe"/>
+    </exec>
+    <mkdir dir="${distdir}"/>
+    <delete>
+      <fileset dir="." includes="${distdir}/gilt-api-client*.jar"/>
+    </delete>
+    
+    <!--<jar destfile="${distdir}/gilt-api-client-${git-desc}.jar" basedir="${classdir}"/>-->
+    <jar destfile="${distdir}/gilt-api-client.jar" basedir="${classdir}"/>
+ 
+  </target>
+  
+  
+  <target name="doc" depends="javadoc" description="Generates javadoc into target/api"/>
+  <target name="docs" depends="javadoc" description="Generates javadoc into target/api"/>
+  <target name="javadoc" description="Generates javadoc into target/api">
+    <delete dir="${docdir}"/>
+    <javadoc
+       destdir="${docdir}"
+       author="true"
+       version="true"
+       use="true"
+       classpathref="classpath"
+       windowtitle="Gilt API Client">
+      
+      <packageset dir="${srcdir}" defaultexcludes="yes">
+        <include name="com/gilt/**"/>
+      </packageset>
+    </javadoc>
+  </target>
+  
+  <!-- =========  TESTING  ============ -->
+  
+  <taskdef resource="testngtasks" classpath="lib/testng-5.9-jdk15.jar"/>  
+  <target  name="all_tests" depends="unit_tests"/>
+  <target name="unit_tests" depends="compile_tests" description="runs unit/functional tests">
+    <testng  classpathref="test_classpath" outputDir="${targetdir}/testng" haltOnFailure="true" verbose="2">
+      <classfileset dir="${test_classdir}" includes="**/**.class" />
+    </testng>
+  </target>
+
+</project>
