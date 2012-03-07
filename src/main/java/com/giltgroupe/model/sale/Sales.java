@@ -11,7 +11,7 @@ import org.codehaus.jackson.annotate.JsonMethod;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 /**
- * TBD
+ * This class is a container class for sales. 
  */
 @JsonAutoDetect(JsonMethod.NONE)
 public class Sales {
@@ -25,6 +25,10 @@ public class Sales {
 
     public List<Sale> getSaleList() { return _sales; }
     
+    /**
+     * This constructor will not only make sure the list of Sales is assigned, it will also
+     * Make sure to bucket the sales into their respective maps - one for stores and one for sale keys
+     */
     @JsonCreator
     public Sales(@JsonProperty("sales") List<Sale> sales) {
         _sales = sales;
@@ -36,7 +40,6 @@ public class Sales {
      * Take the list of Sales and sort them into their respective collections by store
      */
     private void sortSalesByStore() {
-        System.out.println("sorting sales by store");
         _salesByStore = new HashMap<String, List<Sale>>();
         for (Sale sale : _sales) {
             if (_salesByStore.get(sale.getStore()) == null) {
@@ -48,10 +51,9 @@ public class Sales {
     }
 
     /**
-     * TBD
+     * Take the list of Sales and insert them into a Map where the key is the sale key
      */
     private void sortSalesBySaleKey() {
-        System.out.println("sorting sales by sale key");
         _salesBySaleKey = new HashMap<String, Sale>();
         for (Sale sale : _sales) {
             _salesBySaleKey.put(sale.getSaleKey(), sale);
