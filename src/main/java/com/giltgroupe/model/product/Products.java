@@ -3,9 +3,8 @@ package com.giltgroupe.model.product;
 import java.util.HashMap;
 import java.util.Map;
 
-
 public class Products {
-    private Map<Long, Product> _mapProducts;
+    private Map<Long, Product> _mapProducts = new HashMap<Long, Product>();
     
     /**
      * TBD - may want to return an optional here

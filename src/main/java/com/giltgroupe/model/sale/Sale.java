@@ -56,6 +56,7 @@ public class Sale {
     Map<String, List<Image>> _imageUrls = new HashMap<String, List<Image>>();
     
     List<Product> _products = new ArrayList<Product>();
+    Map<Long, Product> _mapProducts = new HashMap<Long, Product>();
 
     public String getName() { return _name; }
 
@@ -93,26 +94,21 @@ public class Sale {
 
     public Map<String, List<Image>> getImageUrls() { return _imageUrls; }
 
-    public void loadProducts(ObjectMapper mapper) {
-        try {
-            for (String productJsonUrl : _productJsonUrls) {
-                URL productUrl = new URL(productJsonUrl + "?apikey=5aa7344bd866dd8128b82bb868811442");
-                System.out.println("Loading product from " + productJsonUrl);
-                JsonNode rootNode = mapper.readTree(productUrl);
-                //System.out.println("** PRODUCT" + rootNode.toString());
-                Product product = mapper.readValue(rootNode, Product.class);
-               
-                _products.add(product);
-                // TBD - also add it to the products object
-            }
-        } catch (MalformedURLException e) {
-            System.out.println("MalformedURLException: " + e);
-                // tbd
-        } catch (IOException e) {
-            System.out.println("IOException: " + e);
-            // tbd
+    public List<Product> getProducts() { return _products; }
+
+    public void addProduct(Product product) { 
+        _products.add(product);
+        _mapProducts.put(product.getId(), product);
+    }
+
+    /**
+     *
+     */
+    public Product findProductById(Long id) {
+        if (_mapProducts == null) {
+            return null;
+        } else {
+            return _mapProducts.get(id);
         }
-       
-        
     }
 }

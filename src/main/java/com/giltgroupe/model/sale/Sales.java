@@ -6,10 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.codehaus.jackson.annotate.JsonAutoDetect;
+import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonMethod;
 import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.map.ObjectMapper;
-
 
 /**
  * TBD
@@ -17,23 +16,27 @@ import org.codehaus.jackson.map.ObjectMapper;
 @JsonAutoDetect(JsonMethod.NONE)
 public class Sales {
 
-    @JsonProperty("sales")
+    @JsonProperty("sales")    
     private List<Sale> _sales;
+
     private Map<String, List<Sale>> _salesByStore = null;
 
+    private Map<String, Sale> _salesBySaleKey = null;
+
     public List<Sale> getSaleList() { return _sales; }
-
-
-    public void load(ObjectMapper mapper) {
+    
+    @JsonCreator
+    public Sales(@JsonProperty("sales") List<Sale> sales) {
+        _sales = sales;
         sortSalesByStore();
-        loadSaleProducts(mapper);
+        sortSalesBySaleKey();
     }
-
+    
     /** 
      * Take the list of Sales and sort them into their respective collections by store
      */
     private void sortSalesByStore() {
-        
+        System.out.println("sorting sales by store");
         _salesByStore = new HashMap<String, List<Sale>>();
         for (Sale sale : _sales) {
             if (_salesByStore.get(sale.getStore()) == null) {
@@ -44,11 +47,37 @@ public class Sales {
         }
     }
 
-    private void loadSaleProducts(ObjectMapper mapper) {
+    /**
+     * TBD
+     */
+    private void sortSalesBySaleKey() {
+        System.out.println("sorting sales by sale key");
+        _salesBySaleKey = new HashMap<String, Sale>();
         for (Sale sale : _sales) {
-            System.out.println("SALE: " + sale.getSaleJsonUrl());
-            sale.loadProducts(mapper);
+            _salesBySaleKey.put(sale.getSaleKey(), sale);
         }
     }
 
+    /**
+     * TBD - improvement - return Optional
+     */
+    public Sale findSaleBySaleKey(String saleKey) {
+        if (_salesBySaleKey != null) {
+            return _salesBySaleKey.get(saleKey);
+        } else {
+            return null;
+        }
+     
+    }
+
+    /**
+     * TBD
+     */
+    public List<Sale> findSalesByStore(String store) {
+        if (_salesByStore != null) {
+            return _salesByStore.get(store);
+        } else { 
+            return (new ArrayList<Sale>());
+        }
+    }
 }
