@@ -82,8 +82,14 @@ public class Gilt {
         fetchSalesAndProducts();
     }
 
-    public void start() {
-        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(new Reloader(), 0, RELOAD_INTERVAL_IN_MIN, TimeUnit.MINUTES);
+    public void start(boolean blocking) {
+        int initDelay = 0;
+        if (blocking) {
+            initDelay = RELOAD_INTERVAL_IN_MIN;
+            fetchData();
+
+        }
+        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(new Reloader(), initDelay, RELOAD_INTERVAL_IN_MIN, TimeUnit.MINUTES);
     }
 
     /**
