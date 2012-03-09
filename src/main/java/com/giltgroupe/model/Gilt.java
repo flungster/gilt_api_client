@@ -20,6 +20,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -33,10 +35,10 @@ import org.codehaus.jackson.map.ObjectMapper;
  * Calling start() will kick off a scheduled task which will occur every 30 minutes to relaod 
  * all sale/product data. 
  */
-public class Gilt {
-   
+public class Gilt {   
     private static final ObjectMapper _mapper = new ObjectMapper();
-    
+    private static Logger _logger = Logger.getLogger(Gilt.class);
+
     private Sales _activeSales = null;
     private Sales _upcomingSales = null;
 
@@ -47,7 +49,7 @@ public class Gilt {
 
 	private final ExecutorService _pool; 
 
-    private static final int RELOAD_INTERVAL_IN_MIN = 30;
+    private static final int RELOAD_INTERVAL_IN_MIN = 5;
 	private static final int THREAD_POOL_SIZE = 5;
 
     private String _apiKey = "";
@@ -60,6 +62,8 @@ public class Gilt {
 		 */
         _mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
+        // TBD - make this configurable
+        _logger.setLevel(Level.INFO);
 		/**
 		 * TBD
 		 */
@@ -96,30 +100,31 @@ public class Gilt {
      * Fetch sales and product information from Gilt
      */
     private void fetchSalesAndProducts() {
-        System.out.println("Beginning of fetch sales");
         try {
             /*
              * Fetch active and upcoming sales
              */
-			System.out.println("-- fetching active sales"); 
+            _logger.info("Fetching active sales");
             URL giltApiUrl = new URL(ACTIVE_SALES_URL + "?apikey=" + getApiKey());
 
             JsonNode rootNode = _mapper.readTree(giltApiUrl);
             Sales activeSales = _mapper.readValue(rootNode, Sales.class);
 
-			System.out.println("-- fetching upcoming sales");
+            _logger.info("Fetching upcoming sales");
             giltApiUrl = new URL(UPCOMING_SALES_URL + "?apikey=" + getApiKey());
             
             rootNode = _mapper.readTree(giltApiUrl);
             Sales upcomingSales = _mapper.readValue(rootNode, Sales.class);
 
             /*
-             * Fetch product data from active sales
+             * Fetch product data from active sales. We are using a fixed thread pool
+             * to parallelize the effort in fetching product information from the API
+             * as opposed to doing it serially.
 			 * NOTE: there is no point in fetching products from upcoming sales
 			 * because Gilt does not expose product information until the
 			 * sale is live.
              */
-			System.out.println("-- fetching products from active sales");
+            _logger.info("Fetching product info");
             List<Sale> saleList = activeSales.getSaleList();
             Products products = new Products();
 			
@@ -142,7 +147,7 @@ public class Gilt {
             /*
              * Swap caches
              */
-			System.out.println("-- swapping caches");
+            _logger.info("swapping caches");
             if (activeSales != null) {
                 _activeSales = activeSales; 
             }
@@ -154,13 +159,10 @@ public class Gilt {
 			_products = products;
             
         } catch (MalformedURLException e) {
-            //System.out.println("MalformedURLException: " + e);
-            // tbd
+            _logger.error("Error - exception caught: " + e);
         } catch (IOException e) {
-            //System.out.println("IOException: " + e);
-            // tbd
+            _logger.error("Error - exception caught: " + e);
         }
-        System.out.println("End of fetch sales");
     }
 
 	protected void fetchProduct(Products products, Sale sale, String productJsonUrl) {
@@ -169,7 +171,6 @@ public class Gilt {
 
 			URL productUrl = new URL(productJsonUrl + "?apikey=" + getApiKey());
 			
-			System.out.println("Fetching product: " + productUrl);
 			JsonNode rootNode = mapper.readTree(productUrl);
 			Product product = mapper.readValue(rootNode, Product.class);
                     
@@ -213,6 +214,9 @@ public class Gilt {
     }
 
 
+    /**
+     *
+     */
 	private class FetchProductCallable implements Callable<Void> {
 		private Sale _sale;
 		private String _productJsonUrl;
