@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
@@ -56,7 +57,7 @@ public class Sale {
     Map<String, List<Image>> _imageUrls = new HashMap<String, List<Image>>();
     
     List<Product> _products = new ArrayList<Product>();
-    Map<Long, Product> _mapProducts = new HashMap<Long, Product>();
+    Map<Long, Product> _mapProducts = new ConcurrentHashMap<Long, Product>();
 
     /**
      * @return

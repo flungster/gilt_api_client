@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -12,8 +13,11 @@ import java.util.regex.Pattern;
  * active and upcoming Sales. 
  */
 public class Products {
-    private Map<Long, Product> _mapProducts = new HashMap<Long, Product>();
+    private Map<Long, Product> _mapProducts = new ConcurrentHashMap<Long, Product>();
     
+
+	public Map<Long, Product> getProducts() { return _mapProducts; }
+
     /**
      * @return Returns a Product given the Product ID else null
      * TBD - may want to return an optional here

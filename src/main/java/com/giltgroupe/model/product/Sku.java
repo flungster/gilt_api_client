@@ -24,6 +24,9 @@ public class Sku {
     @JsonProperty("sale_price")
     private String _salePrice;
 
+	@JsonProperty("shipping_surcharge")
+	private String _shippingSurcharge;
+
     @JsonProperty("attributes")
     private List<SkuAttribute> _attributes;
 
@@ -67,6 +70,10 @@ public class Sku {
      * @param salePrice The new Gilt sale price for the sku
      */
     public void setSalePrice(String salePrice) { _salePrice = salePrice; }
+
+	public String getShippingSurcharge() { return _shippingSurcharge; }
+
+	public void setShippingSurcharge(String shippingSurcharge) { _shippingSurcharge = shippingSurcharge; }
 
     /**
      * @return Return the list of SkuAttribute objects for this sku
