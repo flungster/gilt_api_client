@@ -108,7 +108,6 @@ public class Gilt {
     }
 
 	public void shutdown() {
-		_logger.info("Shut down requested");
 		if (_pool != null) {
 			_pool.shutdownNow();
 		}
@@ -165,13 +164,13 @@ public class Gilt {
 				// return and finish up.
 				List<Future<Void>> taskResults = _pool.invokeAll(fetchProductTasks);
 			} catch (InterruptedException e) {
-				_logger.info("Fetching product info: Interrupted Exception: " + e);
+				_logger.error("Fetching product info: Interrupted Exception: " + e);
 			} catch (NullPointerException e) {
-				_logger.info("Fetching product info: Null Pointer Exception: " + e);
+				_logger.error("Fetching product info: Null Pointer Exception: " + e);
 			} catch (RejectedExecutionException e) {
-				_logger.info("Fetching product info: Rejected Execution Exception: "  + e);
+				_logger.error("Fetching product info: Rejected Execution Exception: "  + e);
 			} catch (Exception e) {
-				_logger.info("Fetching product info: Exception: " + e);
+				_logger.error("Fetching product info: Exception: " + e);
 			}
 
 			/*
@@ -222,7 +221,6 @@ public class Gilt {
 
 			URL productUrl = new URL(productJsonUrl + "?apikey=" + getApiKey());	
 		  
-			_logger.info("Fetching product via " + productJsonUrl + "?apikey=" + getApiKey());
 			URLConnection urlConn = productUrl.openConnection();
 			urlConn.setConnectTimeout(5000);
 			urlConn.setReadTimeout(5000);

@@ -4,20 +4,23 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.log4j.Logger;
 
 /**
  * This is essentially a utility class to easily find all the Products referenced by all
  * active and upcoming Sales. 
  */
 public class Products {
-    private Map<Long, Product> _mapProducts = new ConcurrentHashMap<Long, Product>();
-    
+
+    private Map<Long, Product> _mapProducts = new HashMap<Long, Product>();
 
 	public Map<Long, Product> getProducts() { return _mapProducts; }
 
+	private static Logger _logger = Logger.getLogger(Products.class);
+	
     /**
      * @return Returns a Product given the Product ID else null
      * TBD - may want to return an optional here
@@ -29,7 +32,7 @@ public class Products {
     /**
      * @param product The new product to add to the map cache
      */
-    public void addProduct(Product product) {
+    public synchronized void addProduct(Product product) {
         _mapProducts.put(product.getId(), product);
     }
 
@@ -43,11 +46,9 @@ public class Products {
         List<Product> products = new ArrayList<Product>();
         
         for (Map.Entry<Long, Product> entry : _mapProducts.entrySet()) {
-            System.out.println("Looking at : " + entry.getValue().getProductUrl());
             Matcher matcher = pattern.matcher(entry.getValue().getBrand().toLowerCase());
             if (matcher.matches()) {
                 products.add(entry.getValue());
-                System.out.println("Match found");
             }
         }
 

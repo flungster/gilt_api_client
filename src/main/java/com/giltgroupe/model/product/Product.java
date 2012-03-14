@@ -117,6 +117,6 @@ public class Product {
     /** 
      * @param skus Tnew list of Sku objects this product should have
      */
-    public void setSkues(List<Sku> skus) { _skus = skus; }
+    public void setSkus(List<Sku> skus) { _skus = skus; }
   
 }

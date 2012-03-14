@@ -1,0 +1,38 @@
+The Gilt API Client is a Java-based client jar to the Gilt Public REST API. This library does the following:
+* Using your Gilt-provided API key, connects to the Gilt Public API and retrieves the active sales and products
+* Provides easy-to-use objects which you can easily use in your Java-based applications
+* Caches the collection of active sales and products client side while also provide a background thread to automatically refresh the data cache
+* Provides a simple keyword targeting class to return products that match a series of keywords
+
+This library is a work in progress so please excuse the dust. I intend on adding more features and bullet-proofing the library over the next few weeks when I find the time. In the meantime, please feel free to clone, build, and use the library to your heart's content.
+
+To get started, you'll need:
+* An API Key from Gilt which you can get by registering at dev.gilt.com
+
+To integrate the library into your source, you simply need to do the following to get started:
+
+"
+import com.giltgroupe.model.Gilt;
+import com.giltgroupe.net.GiltFetcher;
+
+...
+
+Gilt gilt = GiltFetcher.getInstance();
+gilt.setApiKey(<your key as a string>);
+gilt.start(true);
+
+..."
+
+Passing true to the start method tells the method to block until it has finished loading all sales and products from Gilt. From that point on, you can simply access sales and products using code as simple as:
+
+"
+// Get the active sales
+Gilt gilt = GiltFetcher.getInstance();
+Sales activeSales = gilt.getActiveSales();
+List<Sale> sales = activeSales.findSalesByStore(store);
+
+// Get a list of products using a sale key
+Sale sale = activeSales.findSaleBySaleKey(<sale key>);
+List<Product> products = sale.getProducts();
+
+TBD - More to come. Enjoy!
