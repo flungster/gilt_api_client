@@ -7,11 +7,12 @@ import java.util.HashSet;
 import java.util.StringTokenizer;
 
 public class Targeting {
+    private static String DELIMITERS = " .,;:-";
 
 	public TargetTree _targetTree = new TargetTree();
 
 	public void addProduct(String phrase, Product product) {
-		StringTokenizer tokenizer = new StringTokenizer(phrase);
+		StringTokenizer tokenizer = new StringTokenizer(phrase, DELIMITERS);
 		while (tokenizer.hasMoreTokens()) {
 			_targetTree.addProductForKeyword(tokenizer.nextToken(), product);
 		}
